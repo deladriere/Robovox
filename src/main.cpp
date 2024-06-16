@@ -1,6 +1,6 @@
 
 
-//#define SERIAL_MIDI
+// #define SERIAL_MIDI
 
 #include <Arduino.h>
 
@@ -16,7 +16,7 @@
 #define MCP23008_ADDR 0x20
 
 // this is ok : both lines
-//#include <MIDI.h>
+// #include <MIDI.h>
 // MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
 // this is  working too both lines
@@ -107,7 +107,7 @@ SSD1306AsciiWire display;
 #define ON 0
 #define OFF 1
 
-//#define DEBUG_TRACE
+// #define DEBUG_TRACE
 
 #ifdef DEBUG_TRACE
 #define Sprintln(MSG) Serial.println(MSG)
