@@ -12,6 +12,7 @@
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiWire.h"
 #include "SDU.h" // to allow updates from SD card
+#include "avdweb_AnalogReadFast.h"
 
 #define MCP23008_ADDR 0x20
 
@@ -235,6 +236,17 @@ byte SetChannel = 1; // to store the MIDI channel : set to 1 to start
 ╚═╝      ╚═════╝  ╚═════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
 
 */
+
+int potReadFast(int pot, int readings)
+{
+  int moy = 0;
+  for (int i = 0; i < readings; i++)
+  {
+    moy = moy + analogReadFast(pot);
+    //  moy=moy +analogReadFast(pot,2);
+  }
+  return moy / readings;
+}
 
 void updateChannel()
 {
@@ -659,7 +671,7 @@ void updateSC02()
 
   if (trigger_cv_phoneme)
   {
-    const size_t cv_phonem_idx = map(analogRead(A6), 0, 0x03FF, 0, kNumPhonems - 1);
+    const size_t cv_phonem_idx = map(potReadFast(A6,50), 0, 0x03FF, 0, kNumPhonems - 1);
     Command(3, B00111111); // Max. velocity.
     TriggerPhonem(cv_phonem_idx);
     trigger_cv_phoneme = false;
