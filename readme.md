@@ -1,5 +1,11 @@
 # Releases 
 
+- 30-06-2024 0.08
+Disabled the randomization on P5
+Improved handling of phonemes in CV mode (Sound)
+
+- 11-08-2021 0.07
+CC3 to control rate (7 bits value)
 - 24-07-2020    V0.06
 Added MIDI CC #2 to control Inflection/Pitch
 - 08-04-2020    V0.05

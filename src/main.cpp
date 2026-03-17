@@ -7,11 +7,11 @@
 #include <limits>
 
 #include "MCP23008.h" //from http://gtbtech.com/?p=875
-#include "Wire.h"
 #include "SDU.h"
+#include "SDU.h" // to allow updates from SD card
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiWire.h"
-#include "SDU.h" // to allow updates from SD card
+#include "Wire.h"
 #include "avdweb_AnalogReadFast.h"
 
 #define MCP23008_ADDR 0x20
@@ -118,8 +118,7 @@ SSD1306AsciiWire display;
 #define Sprint(MSG)
 #endif
 
-struct Phonem
-{
+struct Phonem {
   uint8_t sc02_id;
   const char *label;
 };
@@ -129,74 +128,20 @@ struct Phonem
 // SC02 phonems have been matched to the VS6 phonem set
 // (which resulted in duplicate usage of a few phonems)
 static const Phonem phonems[] = {
-    {0x16, "U"},
-    {0x3D, ":UH"},
-    {0x14, "IU"},
-    {0x3C, ":U"},
-    {0x11, "O"},
-    {0x13, "OO"},
-    {0x3B, ":OH"},
-    {0x10, "AW"},
-    {0x3B, ":OH"},
-    {0x0E, "AH"},
-    {0x08, "A"},
-    {0x1C, "ER"},
-    {0x3E, "E2"},
-    {0x0A, "EH"},
-    {0x07, "I"},
-    {0x01, "E"},
-    {0x06, "IE"},
-    {0x04, "YI"},
-    {0x39, "NG"},
-    {0x37, "M"},
-    {0x20, "L"},
-    {0x38, "N"},
-    {0x1F, "R2"},
-    {0x2C, "HF"},
-    {0x2D, "HFC"},
-    {0x31, "J"},
-    {0x32, "SCH"},
-    {0x2F, "Z"},
-    {0x30, "S"},
-    {0x34, "F"},
-    {0x33, "V"},
-    {0x2C, "HF"},
-    {0x24, "B"},
-    {0x27, "P"},
-    {0x25, "D"},
-    {0x28, "T"},
-    {0x29, "K"},
-    {0x26, "KV"},
-    {0x00, "PA0"},
-    {0x12, "OU"},
-    {0x18, "UH"},
-    {0x0C, "AE"},
-    {0x3A, ":A"},
-    {0x05, "AY"},
-    {0x03, "Y"},
-    {0x2A, "HV"},
-    {0x2B, "HVC"},
-    {0x2E, "HN"},
-    {0x22, "LF"},
-    {0x21, "L1"},
-    {0x3F, "LB"},
-    {0x36, "TH"},
-    {0x35, "THV"},
-    {0x1D, "R"},
-    {0x1E, "R1"},
-    {0x23, "W"},
-    {0x26, "KV"},
-    {0x2B, "HVC"},
-    {0x02, "E1"},
-    {0x09, "AI"},
-    {0x0B, "EH1"},
-    {0x0D, "AE1"},
-    {0x0F, "AH1"},
-    {0x15, "IU1"},
-    {0x17, "U1"},
-    {0x19, "UH1"},
-    {0x1A, "UH2"},
-    {0x1B, "UH3"}};
+    {0x16, "U"},   {0x3D, ":UH"}, {0x14, "IU"},  {0x3C, ":U"},  {0x11, "O"},
+    {0x13, "OO"},  {0x3B, ":OH"}, {0x10, "AW"},  {0x3B, ":OH"}, {0x0E, "AH"},
+    {0x08, "A"},   {0x1C, "ER"},  {0x3E, "E2"},  {0x0A, "EH"},  {0x07, "I"},
+    {0x01, "E"},   {0x06, "IE"},  {0x04, "YI"},  {0x39, "NG"},  {0x37, "M"},
+    {0x20, "L"},   {0x38, "N"},   {0x1F, "R2"},  {0x2C, "HF"},  {0x2D, "HFC"},
+    {0x31, "J"},   {0x32, "SCH"}, {0x2F, "Z"},   {0x30, "S"},   {0x34, "F"},
+    {0x33, "V"},   {0x2C, "HF"},  {0x24, "B"},   {0x27, "P"},   {0x25, "D"},
+    {0x28, "T"},   {0x29, "K"},   {0x26, "KV"},  {0x00, "PA0"}, {0x12, "OU"},
+    {0x18, "UH"},  {0x0C, "AE"},  {0x3A, ":A"},  {0x05, "AY"},  {0x03, "Y"},
+    {0x2A, "HV"},  {0x2B, "HVC"}, {0x2E, "HN"},  {0x22, "LF"},  {0x21, "L1"},
+    {0x3F, "LB"},  {0x36, "TH"},  {0x35, "THV"}, {0x1D, "R"},   {0x1E, "R1"},
+    {0x23, "W"},   {0x26, "KV"},  {0x2B, "HVC"}, {0x02, "E1"},  {0x09, "AI"},
+    {0x0B, "EH1"}, {0x0D, "AE1"}, {0x0F, "AH1"}, {0x15, "IU1"}, {0x17, "U1"},
+    {0x19, "UH1"}, {0x1A, "UH2"}, {0x1B, "UH3"}};
 
 static const size_t kNumPhonems = sizeof(phonems) / sizeof(Phonem);
 static const size_t kPA0PhonemIdx = 38;
@@ -205,8 +150,7 @@ int i;
 byte hello[] = {44, 10, 32, 17, 35, 0, 0x23, 0x1C, 0x20, 0x25};
 byte last_note_on = 0;
 
-struct SC02Config
-{
+struct SC02Config {
   byte filter_freq = 0;
   byte inflection = 0;
   byte rate = 0;
@@ -237,21 +181,17 @@ byte SetChannel = 1; // to store the MIDI channel : set to 1 to start
 
 */
 
-int potReadFast(int pot, int readings)
-{
+int potReadFast(int pot, int readings) {
   int moy = 0;
-  for (int i = 0; i < readings; i++)
-  {
+  for (int i = 0; i < readings; i++) {
     moy = moy + analogReadFast(pot);
     //  moy=moy +analogReadFast(pot,2);
   }
   return moy / readings;
 }
 
-void updateChannel()
-{
-  if (rotF)
-  {
+void updateChannel() {
+  if (rotF) {
     Wire.setClock(1500000L); // speed the display to the max
     display.setCursor(0, 6);
     display.clearToEOL();
@@ -262,36 +202,30 @@ void updateChannel()
   rotF = 0;
   SetChannel = interruptCount;
 }
-void rot()
-{
+void rot() {
 
-  if (digitalRead(ROTA))
-  {
-    if (digitalRead(ROTB))
-    {
+  if (digitalRead(ROTA)) {
+    if (digitalRead(ROTB)) {
       interruptCount--;
-    }
-    else
-    {
+    } else {
       interruptCount++;
     }
     // set rotflag on
     rotF = 1;
   }
-  interruptCount = constrain(interruptCount, 1, 16); // to remove later when using the rotary for something else
+  interruptCount =
+      constrain(interruptCount, 1,
+                16); // to remove later when using the rotary for something else
 }
 
-void toggleCarrier()
-{
-  if (millis() - lastSW1 > DEBOUNCE)
-  {
+void toggleCarrier() {
+  if (millis() - lastSW1 > DEBOUNCE) {
     // TODO:  needs debouncing
     digitalWrite(MISO, digitalRead(SW1));
     lastSW1 = millis();
   }
 }
-void toggleDisplay()
-{
+void toggleDisplay() {
   // TODO: add very long press to disable display
   // TODO: may need debouncing
   dispStatus = !dispStatus;
@@ -299,8 +233,7 @@ void toggleDisplay()
   display.ssd1306WriteCmd(0X10 + (dispStatus << 3));
 }
 
-void Transfer(word sdi)
-{
+void Transfer(word sdi) {
   int value = 0; // set D15 test value to zero;
 
   digitalWrite(SEN, LOW);       // set Serial Enable True at ltc6903
@@ -310,9 +243,7 @@ void Transfer(word sdi)
     if (value != 0)      // 1?
     {
       digitalWrite(SDI, HIGH); // Set SDI to TRUE
-    }
-    else
-    {
+    } else {
       digitalWrite(SDI, LOW); // Else set to LOW
     }
     digitalWrite(SCLK, LOW);  // Drop the clock line
@@ -323,23 +254,20 @@ void Transfer(word sdi)
   digitalWrite(SDI, HIGH); // put data high as initial state
 }
 
-void ltc6903(int oct, unsigned int dac)
-{
+void ltc6903(int oct, unsigned int dac) {
   Word = oct;     // do OCT first
   Word <<= 12;    // move it to D15
   dac <<= 2;      // align the DAC value
   Word |= dac;    // OR it in, leave CN1 and CN0 at zero
   Transfer(Word); // Send word as sdi to ltc6903
 }
-void Strobe()
-{
+void Strobe() {
   digitalWrite(RW, LOW);
   delayMicroseconds(1);
   digitalWrite(RW, HIGH);
 }
 
-void Command(byte registre, byte value)
-{
+void Command(byte registre, byte value) {
 
   digitalWrite(RS0, registre & B00000001);
   digitalWrite(RS1, registre & B00000010);
@@ -351,9 +279,9 @@ void Command(byte registre, byte value)
   Strobe();
 }
 
-void resetSC02Config()
-{
-  Command(3, B01111111); // Set articulation to normal and amplitude to maximum  & CTL to 0
+void resetSC02Config() {
+  Command(3, B01111111); // Set articulation to normal and amplitude to maximum
+                         // & CTL to 0
   Command(4, B11110000); // Set Filter frequency to normal (231)
   Command(2, B11001000); // Set Speech rate to normal (168)
   Command(1, B01111111); // inflection
@@ -364,30 +292,25 @@ void resetSC02Config()
   ltc6903(10, 516); // Set pitch to middle of pitch wheel
 }
 
-void toggleCVControl()
-{
+void toggleCVControl() {
   cv_control_enabled = !cv_control_enabled;
-  if (!cv_control_enabled)
-  {
+  if (!cv_control_enabled) {
     trigger_sc02_reset = true;
   }
 }
 
-void WritePhonemToSc02(byte value)
-{
+void WritePhonemToSc02(byte value) {
   // Hack to avoid occasional carrier noise when external carrier is used.
   // Switching to the internal carrier seem to silence the noise floor.
   static bool reactivate_ext_input = false;
-  if (reactivate_ext_input && value != 0)
-  {
+  if (reactivate_ext_input && value != 0) {
     digitalWrite(MISO, digitalRead(SW1));
     reactivate_ext_input = false;
   }
 
   Command(0, value + B11000000);
 
-  if (digitalRead(SW1) && value == 0)
-  {
+  if (digitalRead(SW1) && value == 0) {
     delay(10);
     digitalWrite(MISO, 0);
     reactivate_ext_input = true;
@@ -397,8 +320,7 @@ void WritePhonemToSc02(byte value)
   //   ;
 }
 
-void controlChange(byte channel, byte number, byte value)
-{
+void controlChange(byte channel, byte number, byte value) {
   switch (number)
 
   {
@@ -407,11 +329,11 @@ void controlChange(byte channel, byte number, byte value)
     break;
 
   case 2:
-    /* it should be                                    // breath control used to control Inflection
-    Word = value << 5;                            // convert to 12 bits  using temp variable;
-    Command(2, 0b11000000 + ((Word >> 11) << 3)); // keeping Rate untouched
-    Command(1, (Word & 0b011111111000) >> 3);
-    but the next command seems to work ?
+    /* it should be                                    // breath control used to
+    control Inflection Word = value << 5;                            // convert
+    to 12 bits  using temp variable; Command(2, 0b11000000 + ((Word >> 11) <<
+    3)); // keeping Rate untouched Command(1, (Word & 0b011111111000) >> 3); but
+    the next command seems to work ?
   */
     Command(1, (value << 1));
     break;
@@ -426,52 +348,43 @@ void controlChange(byte channel, byte number, byte value)
   }
 }
 
-void Clock()
-{
+void Clock() {
 
   DivClock++;
   if (DivClock > 5) // divide by 6
   {
     digitalWrite(BUSY, 1);
     DivClock = 0;
-  }
-  else
-  {
+  } else {
     digitalWrite(BUSY, 0);
   }
 }
 
-void Start()
-{
+void Start() {
   DivClock = 0;
   Sprintln("Start");
 }
 
-void Stop()
-{
-  Sprint("Stop");
-}
+void Stop() { Sprint("Stop"); }
 
-void pitchBend(byte channel, int bend)
-{
+void pitchBend(byte channel, int bend) {
 
   Sprintln(bend);
 
   ltc6903(10, map(bend, 8191, -8192, 1023, 8));
 }
 
-void TriggerPhonem(const size_t phonem_idx)
-{
+void TriggerPhonem(const size_t phonem_idx) {
 
   size_t idx = phonem_idx;
   const float randf = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-  if (phonem_idx != kPA0PhonemIdx &&
-      randf < sc02_config.randomization)
-  {
-    idx = rand() % (kNumPhonems - 1);
+  if (phonem_idx != kPA0PhonemIdx && randf < sc02_config.randomization) {
+    //   idx = rand() % (kNumPhonems - 1); // disabled in v0.06 for Anthony R,
+    //   TODO: add a threshold
   }
   const Phonem &phonem = phonems[idx];
-  WritePhonemToSc02(phonem.sc02_id); // let's start speech first to avoid delays from Oled
+  WritePhonemToSc02(
+      phonem.sc02_id); // let's start speech first to avoid delays from Oled
 
   //  Command(1, map(analogRead(A1), 0, 255, 0, 255));
   Wire.setClock(1500000L); // speed the display to the max
@@ -481,21 +394,20 @@ void TriggerPhonem(const size_t phonem_idx)
   display.setCursor(60, 2);
   display.clearToEOL();
   display.print(phonem.label);
-  Wire.setClock(500000L); // Restore I2C speed to allow speech
-                          //  if (phonem->sc02_id)    // to filter out the PA0 (id = 0)
-                          //  {
+  Wire.setClock(
+      500000L); // Restore I2C speed to allow speech
+                //  if (phonem->sc02_id)    // to filter out the PA0 (id = 0)
+                //  {
   Serial.println(phonem.label);
 }
 
-void handleNoteOn(byte channel, byte pitch, byte velocity)
-{
+void handleNoteOn(byte channel, byte pitch, byte velocity) {
   // Log when a note is pressed.
-  // Serial.printf("Note on: channel = %d, pitch = %d, velocity - %d", channel, pitch, velocity);
-  // Serial.println();
+  // Serial.printf("Note on: channel = %d, pitch = %d, velocity - %d", channel,
+  // pitch, velocity); Serial.println();
   analogWrite(RED_LED, 255 - (velocity << 1));
 
-  if (channel == SetChannel)
-  {
+  if (channel == SetChannel) {
 
     last_note_on = pitch;
     pitch = constrain(pitch, 36, 93);
@@ -508,18 +420,17 @@ void handleNoteOn(byte channel, byte pitch, byte velocity)
   }
 }
 
-void handleNoteOff(byte channel, byte pitch, byte velocity)
-{
+void handleNoteOff(byte channel, byte pitch, byte velocity) {
   // Log when a note is released.
-  // Serial.printf("Note off: channel = %d, pitch = %d, velocity - %d", channel, pitch, velocity);
-  // Serial.println();
+  // Serial.printf("Note off: channel = %d, pitch = %d, velocity - %d", channel,
+  // pitch, velocity); Serial.println();
 
-  if (channel == SetChannel)
-  {
-    if (last_note_on == pitch)
-    {
+  if (channel == SetChannel) {
+    if (last_note_on == pitch) {
       // analogWrite(RED_LED, 255);
-      pinMode(RED_LED, OUTPUT); // to allow switching the led off see : https://forum.arduino.cc/index.php?topic=156413.15
+      pinMode(RED_LED,
+              OUTPUT); // to allow switching the led off see :
+                       // https://forum.arduino.cc/index.php?topic=156413.15
       digitalWrite(RED_LED, OFF);
       //   digitalWrite(BUSY, OFF);
       TriggerPhonem(kPA0PhonemIdx);
@@ -527,10 +438,8 @@ void handleNoteOff(byte channel, byte pitch, byte velocity)
   }
 }
 
-void cvTrigger()
-{
-  if (!digitalRead(GATE))
-  {
+void cvTrigger() {
+  if (!digitalRead(GATE)) {
     trigger_cv_phoneme = true;
     return;
   }
@@ -538,8 +447,7 @@ void cvTrigger()
   trigger_pa0_phoneme = true;
 }
 
-void setup()
-{
+void setup() {
 
   // USBDevice.setManufacturerDescriptor("Polaxis");
   // USBDevice.setProductDescriptor("Robovox");
@@ -594,13 +502,14 @@ void setup()
   digitalWrite(SCLK, HIGH); // set safely high
   digitalWrite(SDI, HIGH);  // set safely high
 
-  display.begin(&Adafruit128x64, 0x3C); // initialize with the I2C addr 0x3D (for the 128x64)
+  display.begin(&Adafruit128x64,
+                0x3C); // initialize with the I2C addr 0x3D (for the 128x64)
   display.clear();
   display.set1X();
   display.setFont(fixed_bold10x15);
   display.println("Robovox MIDI");
   display.setRow(4);
-  display.println("Ver. 0.07");
+  display.println("Ver. 0.08");
   display.setRow(6);
   display.println(VERSION);
 
@@ -641,8 +550,7 @@ void setup()
   // Set initial carrier mode.
   toggleCarrier();
 
-  for (int y = 0; y < 10; y++)
-  {
+  for (int y = 0; y < 10; y++) {
     WritePhonemToSc02(hello[y]);
     delay(100);
   }
@@ -650,17 +558,14 @@ void setup()
   attachInterrupt(GATE, cvTrigger, CHANGE);
 }
 
-void updateSC02()
-{
-  if (trigger_sc02_reset)
-  {
+void updateSC02() {
+  if (trigger_sc02_reset) {
     resetSC02Config();
     trigger_sc02_reset = false;
   }
 
   static bool last_cv_control_enabled = false;
-  if (cv_control_enabled != last_cv_control_enabled)
-  {
+  if (cv_control_enabled != last_cv_control_enabled) {
     Wire.setClock(1500000L); // speed the display to the max
     display.setCursor(0, 4);
     display.clearToEOL();
@@ -669,54 +574,48 @@ void updateSC02()
     last_cv_control_enabled = cv_control_enabled;
   }
 
-  if (trigger_cv_phoneme)
-  {
-    const size_t cv_phonem_idx = map(potReadFast(A6,50), 0, 0x03FF, 0, kNumPhonems - 1);
+  if (trigger_cv_phoneme) {
+    const size_t cv_phonem_idx =
+        map(potReadFast(A6, 50), 0, 0x03FF, 0, kNumPhonems - 1);
     Command(3, B00111111); // Max. velocity.
     TriggerPhonem(cv_phonem_idx);
     trigger_cv_phoneme = false;
   }
 
-  if (trigger_pa0_phoneme)
-  {
+  if (trigger_pa0_phoneme) {
     Command(3, B00111111);        // Max. velocity.
     TriggerPhonem(kPA0PhonemIdx); // PA0 phonem
     trigger_pa0_phoneme = false;
   }
 
-  sc02_config.randomization = 1.0f -
-                              static_cast<float>(analogRead(A5)) / static_cast<float>(0x03FF);
+  sc02_config.randomization =
+      1.0f - static_cast<float>(analogRead(A5)) / static_cast<float>(0x03FF);
 
-  if (!cv_control_enabled)
-  {
+  if (!cv_control_enabled) {
     return;
   }
   // Pitch control via master clock
   ltc6903(10, map(analogRead(A1), 0, 0x03FF, 0x03FF, 0));
 
   byte inflection = map(analogRead(A2), 0, 0x03FF, 0xFF, 0);
-  if (inflection != sc02_config.inflection)
-  {
+  if (inflection != sc02_config.inflection) {
     Command(1, inflection);
     sc02_config.inflection = inflection;
   }
   byte filter_freq = map(analogRead(A3), 0, 0x03FF, 0, 0xFF);
   filter_freq = constrain(filter_freq, 0, 0xFF);
-  if (filter_freq != sc02_config.filter_freq)
-  {
+  if (filter_freq != sc02_config.filter_freq) {
     Command(4, filter_freq);
     sc02_config.filter_freq = filter_freq;
   }
   byte rate = map(analogRead(A4), 0, 0x03FF, 0, 0x0F);
-  if (rate != sc02_config.rate)
-  {
+  if (rate != sc02_config.rate) {
     Command(2, (rate << 4) + B1000);
     sc02_config.rate = rate;
   }
 }
 
-void loop()
-{
+void loop() {
   // read any new MIDI messages
   MIDI.read();
   // digitalWrite(MISO, digitalRead(SW1));
