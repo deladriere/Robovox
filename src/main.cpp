@@ -434,9 +434,10 @@ void handleNoteOn(byte channel, byte pitch, byte velocity) {
     // Use full MIDI note range; table has entries for 0..127 (2 bytes each).
     const byte clampedNote = constrain(pitch, 0, 127);
     const int index = static_cast<int>(clampedNote) * 2;
-    const uint8_t pitch_low = PITCH_TABLE[index];         // Register 1 value
-    const uint8_t pitch_high = PITCH_TABLE[index + 1];    // Register 2 base
-    const uint8_t reg2_val = static_cast<uint8_t>(pitch_high | 0xA0); // Ensure External Pitch + Step
+    const uint8_t pitch_low = PITCH_TABLE[index];      // Register 1 value
+    const uint8_t pitch_high = PITCH_TABLE[index + 1]; // Register 2 base
+    const uint8_t reg2_val =
+        static_cast<uint8_t>(pitch_high | 0xA0); // Ensure External Pitch + Step
 
     Command(1, pitch_low);
     Command(2, reg2_val);
