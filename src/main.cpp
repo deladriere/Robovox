@@ -13,6 +13,7 @@
 #include "SSD1306AsciiWire.h"
 #include "Wire.h"
 #include "avdweb_AnalogReadFast.h"
+#include "sc02_pitch.h"
 
 #define MCP23008_ADDR 0x20
 
@@ -20,14 +21,12 @@
 // #include <MIDI.h>
 // MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
-// this is  working too both lines
-#ifdef SERIAL_MIDI
+// Always support both USB MIDI and Serial MIDI
 #include <MIDI.h>
-MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
-#else
 #include <USB-MIDI.h>
+// USB MIDI instance and HW Serial MIDI instance for callbacks
 USBMIDI_CREATE_DEFAULT_INSTANCE();
-#endif
+MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDISER);
 
 /*
 
@@ -100,11 +99,7 @@ SSD1306AsciiWire display;
      ████   ██   ██ ██   ██ ██ ██   ██ ██████  ███████ ███████ ███████
 
  */
-#ifdef SERIAL_MIDI
-#define VERSION "SERIAL MODE"
-#else
-#define VERSION "USB MODE"
-#endif
+#define VERSION "USB+SERIAL"
 #define ON 0
 #define OFF 1
 
@@ -280,16 +275,30 @@ void Command(byte registre, byte value) {
 }
 
 void resetSC02Config() {
-  Command(3, B01111111); // Set articulation to normal and amplitude to maximum
-                         // & CTL to 0
-  Command(4, B11110000); // Set Filter frequency to normal (231)
-  Command(2, B11001000); // Set Speech rate to normal (168)
-  Command(1, B01111111); // inflection
+  Command(3, 0x80); // Set Control Bit 7 High
+  Command(0, 0x80); // Write to Phoneme Reg (Sustain/Loop setup)
+  Command(3, 0x00); // Clear Control Bit 7 Low
 
-  sc02_config.filter_freq = B11110000;
-  sc02_config.inflection = B01111111;
-  sc02_config.rate = B1100;
-  ltc6903(10, 516); // Set pitch to middle of pitch wheel
+  // Configure external pitch mode + step mode with a medium rate.
+  const uint8_t default_rate_base = 0x09;
+  const uint8_t r2_value = static_cast<uint8_t>(default_rate_base | 0xA0);
+  Command(2, r2_value);
+
+  // Set baseline inflection/pitch for singing mode.
+  const uint8_t default_pitch_fine = 0x11;
+  Command(1, default_pitch_fine);
+
+  // Control & amplitude preset: keep immediate amplitude update behavior.
+  Command(3, 0x5C);
+  // Vocal tract filter preset.
+  Command(4, 0xE9);
+  // Idle state (PA0 / silence).
+  Command(0, 0x00);
+
+  sc02_config.filter_freq = 0xE9;
+  sc02_config.inflection = default_pitch_fine;
+  sc02_config.rate = default_rate_base;
+  ltc6903(10, 959); // Set pitch baseline for singing mode
 }
 
 void toggleCVControl() {
@@ -410,13 +419,27 @@ void handleNoteOn(byte channel, byte pitch, byte velocity) {
   if (channel == SetChannel) {
 
     last_note_on = pitch;
-    pitch = constrain(pitch, 36, 93);
+    pitch = constrain(pitch, 36, 103);
 
     // digitalWrite(BUSY, ON); // to measure latency from MIDI Note On to speech
     // Apply Velocity.
     Command(3, map(velocity, 0, 127, 0, 15) + B00110000);
     TriggerPhonem(pitch - 36);
     // }
+  }
+
+  // Pitch control on "rotary + 1" channel, using the SC-02 pitch table.
+  const byte pitchChannel = static_cast<byte>((SetChannel % 16) + 1);
+  if (channel == pitchChannel) {
+    // Use full MIDI note range; table has entries for 0..127 (2 bytes each).
+    const byte clampedNote = constrain(pitch, 0, 127);
+    const int index = static_cast<int>(clampedNote) * 2;
+    const uint8_t pitch_low = PITCH_TABLE[index];         // Register 1 value
+    const uint8_t pitch_high = PITCH_TABLE[index + 1];    // Register 2 base
+    const uint8_t reg2_val = static_cast<uint8_t>(pitch_high | 0xA0); // Ensure External Pitch + Step
+
+    Command(1, pitch_low);
+    Command(2, reg2_val);
   }
 }
 
@@ -467,23 +490,31 @@ void setup() {
   // Initialize MIDI, and listen to all MIDI channels
   // This will also call usb_midi's begin()
   MIDI.begin(MIDI_CHANNEL_OMNI);
+  MIDISER.begin(MIDI_CHANNEL_OMNI);
 
   // Attach the handleNoteOn function to the MIDI Library. It will
   // be called whenever the Bluefruit receives MIDI Note On messages.
   MIDI.setHandleNoteOn(handleNoteOn);
+  MIDISER.setHandleNoteOn(handleNoteOn);
 
   // Do the same for MIDI Note Off messages.
   MIDI.setHandleNoteOff(handleNoteOff);
+  MIDISER.setHandleNoteOff(handleNoteOff);
 
   MIDI.setHandleControlChange(controlChange);
+  MIDISER.setHandleControlChange(controlChange);
 
   MIDI.setHandlePitchBend(pitchBend);
+  MIDISER.setHandlePitchBend(pitchBend);
 
   MIDI.setHandleClock(Clock);
+  MIDISER.setHandleClock(Clock);
 
   MIDI.setHandleStart(Start);
+  MIDISER.setHandleStart(Start);
 
   MIDI.setHandleStop(Stop);
+  MIDISER.setHandleStop(Stop);
 
   Serial.begin(115200);
 
@@ -509,7 +540,7 @@ void setup() {
   display.setFont(fixed_bold10x15);
   display.println("Robovox MIDI");
   display.setRow(4);
-  display.println("Ver. 0.08");
+  display.println("Ver. 0.9");
   display.setRow(6);
   display.println(VERSION);
 
@@ -610,7 +641,8 @@ void updateSC02() {
   }
   byte rate = map(analogRead(A4), 0, 0x03FF, 0, 0x0F);
   if (rate != sc02_config.rate) {
-    Command(2, (rate << 4) + B1000);
+    // Preserve External Pitch + Step bits while updating rate nibble.
+    Command(2, static_cast<uint8_t>(0xA0 | (rate & 0x0F)));
     sc02_config.rate = rate;
   }
 }
@@ -618,6 +650,7 @@ void updateSC02() {
 void loop() {
   // read any new MIDI messages
   MIDI.read();
+  MIDISER.read();
   // digitalWrite(MISO, digitalRead(SW1));
   updateSC02();
   updateChannel();

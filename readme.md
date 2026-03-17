@@ -1,46 +1,54 @@
-# Releases 
+# Releases
 
-- 30-06-2024 0.08
-Disabled the randomization on P5
-Improved handling of phonemes in CV mode (Sound)
+## 0.9 - 17-03-2026
+- Dual MIDI support enabled by default (USB + Serial)
+- Added pitch control from a second MIDI channel (rotary channel + 1) using SC-02 pitch table
+- Extended phoneme note range from 93 to 103
 
-- 11-08-2021 0.07
-CC3 to control rate (7 bits value)
-- 24-07-2020    V0.06
-Added MIDI CC #2 to control Inflection/Pitch
-- 08-04-2020    V0.05
- Added CV controls : P1 master clock / P2 Inflection / P3 filter frequency / P4 rate
- Added MIDI channel chooser via the rotary knob
-- 05-04-2020	V0.04
-Hack to avoid occasional carrier noise when external carrier is used
-- 07-03-0220	V0.03
-Update via SD card, External carrier via CC sustain or front panel switch (mid-low position)
-- 20-10-2019	v0.02
-MIDI clock available on
-Busy Jack
-- 22-06-2019	v0.01
-Initial release
+## 0.08 - 30-06-2024
+- Disabled the randomization on P5
+- Improved handling of phonemes in CV mode (Sound)
 
-# Todo
-- CV control for articulation on P5
-- CV control for phonemes input via the Sound pot
-- [x] use the same code for the Serial MIDI mode (via DEFINE)
+## 0.07 - 11-08-2021
+- CC3 to control rate (7-bit value)
+
+## 0.06b - 11-09-2020
+- LED intensity is driven by Note Velocity
+
+## 0.06 - 24-07-2020
+- Added MIDI CC #2 to control Inflection/Pitch
+
+## 0.05 - 08-04-2020
+- Added CV controls: P1 master clock / P2 inflection / P3 filter frequency / P4 rate
+- Added MIDI channel chooser via the rotary knob
+
+## 0.04 - 05-04-2020
+- Hack to avoid occasional carrier noise when external carrier is used
+
+## 0.03 - 07-03-0220
+- Update via SD card, external carrier via CC sustain or front panel switch (mid-low position)
+
+## 0.02 - 20-10-2019
+- MIDI clock available on Busy jack
+
+## 0.01 - 22-06-2019
+- Initial release
+
 
 
 # MIDI controls
-- MIDI note ON/OFF mapped to the SC02's phonemes
+- MIDI note ON/OFF mapped to the SC02 phonemes
 - Velocity
 - Pitch
 - Mod Wheel mapped to filter
 - CC 64 sustain ON/OFF to choose between internal and external carrier
 
-The MIDI clock is available on the Busy jack
+The MIDI clock is available on the Busy jack.
 
 # Gate
-Trigger the phonem
+Triggers the phoneme.
 
 # CV controls
-
 ## P1
 Master clock pitch control
 
@@ -54,16 +62,16 @@ Filter frequency
 Rate
 
 ## P5
-Phonem randomization 
+Phoneme randomization
 
 ## SOUND
-Phonem
+Phoneme
 
 # Rotary
 ## Push
-To activate and desactivate the CV controls
+Activate/deactivate CV controls.
 
 # Switch
-- Upper position : Not used
-- Midlle postion : external carrier
-- Lower position : internal carrier
+- Upper position: Not used
+- Middle position: external carrier
+- Lower position: internal carrier
